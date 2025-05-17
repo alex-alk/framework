@@ -1,11 +1,22 @@
 {
     "require": {
-        "alex-alk/http-client": "dev-main"
+        "alex-alk/http-client": "dev-main",
+        "psr/container": "^2.0"
     },
     "repositories": [
         {
             "type": "vcs",
             "url": "https://github.com/alex-alk/http-client.git"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "": "public/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    }
 }

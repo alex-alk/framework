@@ -1,0 +1,11 @@
+{
+    "require": {
+        "alex-alk/http-client": "dev-main"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/alex-alk/http-client.git"
+        }
+    ]
+}

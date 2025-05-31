@@ -21,6 +21,8 @@ class RequestHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $requestUri = $request->getUri()->getPath();
+        // todo: numai dupa base url
+        $requestUri = str_replace(env('APP_FOLDER'), '', $requestUri);
 
         $requestMethod = $request->getMethod();
 

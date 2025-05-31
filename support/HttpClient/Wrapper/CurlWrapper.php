@@ -2,10 +2,13 @@
 
 namespace HttpClient\Wrapper;
 
+use CurlHandle;
+use CurlMultiHandle;
+
 class CurlWrapper
 {
     // Single handle
-    public function init(): mixed
+    public function init(): CurlHandle
     {
         return curl_init();
     }
@@ -41,7 +44,7 @@ class CurlWrapper
     }
 
     // Multi handle
-    public function multiInit(): mixed
+    public function multiInit(): CurlMultiHandle
     {
         return curl_multi_init();
     }

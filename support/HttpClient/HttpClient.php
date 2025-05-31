@@ -27,6 +27,9 @@ class HttpClient implements ClientInterface
 
     private array $extraOptions = [];
 
+    /**
+     * ex: [CURLOPT_SSL_VERIFYPEER => false]
+     */
     public function setExtraOptions(array $extraOptions): void
     {
         $this->extraOptions = $extraOptions;
@@ -79,7 +82,7 @@ class HttpClient implements ClientInterface
 
         // 1) init handles
         foreach ($requests as $key => $request) {
-            $ch = $this->curl->init((string)$request->getUri());
+            $ch = $this->curl->init((string) $request->getUri());
             $this->curl->setoptArray($ch, $this->extraOptions + [
                 CURLOPT_CUSTOMREQUEST  => $request->getMethod(),
                 CURLOPT_RETURNTRANSFER => true,
@@ -111,55 +114,47 @@ class HttpClient implements ClientInterface
                 }
                 if (strpos($trim, ':') !== false) {
                     [$n, $v] = explode(':', $trim, 2);
-                    $headerStore[(int)$ch][trim($n)][] = trim($v);
+                    $headerStore[(int) $ch][trim($n)][] = trim($v);
                 }
                 return strlen($line);
             });
 
-            $this->curl->multi_add_handle($multi, $ch);
+            $this->curl->multiAddHandle($multi, $ch);
             $handles[$key] = $ch;
         }
 
         // 2) execute
         do {
-            $status = $this->curl->multi_exec($multi, $active);
+            $status = $this->curl->multiExec($multi, $active);
             if ($status > CURLM_OK) {
                 break;
             }
-            $this->curl->multi_select($multi);
+            $this->curl->multiSelect($multi);
         } while ($active);
 
         // 3) collect
         $responses = [];
         foreach ($handles as $key => $ch) {
-            if (($err = $this->curl->error($ch)) !== '') {
-                $this->curl->multi_remove_handle($multi, $ch);
-                $this->curl->close($ch);
-                $this->curl->multi_close($multi);
-                throw new class($err) extends \RuntimeException implements ClientExceptionInterface {};
-            }
-
-            $body       = $this->curl->multi_getcontent($ch);
             $statusCode = $this->curl->getinfo($ch, CURLINFO_HTTP_CODE);
-            $headers    = $headerStore[(int)$ch] ?? [];
 
-            // build PSR-7 response
-            $resp = $this->responseFactory->createResponse($statusCode);
-
-            foreach ($headers as $n => $vals) {
-                foreach ($vals as $v) {
-                    $resp = $resp->withAddedHeader($n, $v);
-                }
+            if (($err = $this->curl->error($ch)) !== '') {
+                $this->curl->multiRemoveHandle($multi, $ch);
+                $this->curl->close($ch);
+                $this->curl->multiClose($multi);
+                throw new RequestException($err, $request, $statusCode);
             }
-            $resp = $resp->withBody($this->streamFactory->createStream($body));
+
+            $body = $this->curl->multiGetContent($ch);
+            
+            $resp = new Response($body, $statusCode, $headerStore[(int) $ch]);
 
             $responses[$key] = $resp;
 
-            $this->curl->multi_remove_handle($multi, $ch);
+            $this->curl->multiRemoveHandle($multi, $ch);
             $this->curl->close($ch);
         }
 
-        $this->curl->multi_close($multi);
+        $this->curl->multiClose($multi);
         return $responses;
     }
 

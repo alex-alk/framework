@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace RequestHandler;
 
 use RequestHandler\Stream;
 use Psr\Http\Message\UploadedFileInterface;
@@ -14,19 +14,22 @@ class UploadedFile implements UploadedFileInterface
     private string $clientFilename;
     private string $clientMediaType;
     private bool $moved = false;
+    private $filesystem;
 
     public function __construct(
         string $file,
         int $size,
         int $error,
         string $clientFilename,
-        string $clientMediaType
+        string $clientMediaType,
+        ?FilesystemInterface $filesystem = null // inject dependency, with default
     ) {
         $this->file = $file;
         $this->size = $size;
         $this->error = $error;
         $this->clientFilename = $clientFilename;
         $this->clientMediaType = $clientMediaType;
+        $this->filesystem = $filesystem ?: new LocalFilesystem();
     }
 
     public function getStream(): StreamInterface
@@ -42,7 +45,8 @@ class UploadedFile implements UploadedFileInterface
         if ($this->moved) {
             throw new \RuntimeException("File already moved");
         }
-        if (!is_uploaded_file($this->file) || !move_uploaded_file($this->file, $targetPath)) {
+        if (!$this->filesystem->isUploadedFile($this->file) ||
+            !$this->filesystem->moveUploadedFile($this->file, $targetPath)) {
             throw new \RuntimeException("Failed to move uploaded file");
         }
         $this->moved = true;

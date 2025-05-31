@@ -2,7 +2,6 @@
 
 namespace RequestHandler;
 
-use App\UploadedFile;
 use HttpClient\Message\Uri;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\RequestInterface;
@@ -73,10 +72,6 @@ class ServerRequest implements ServerRequestInterface
 
     private static function getAllHeaders(): array
     {
-        if (function_exists('getallheaders')) {
-            return getallheaders();
-        }
-
         $headers = [];
         foreach ($_SERVER as $name => $value) {
             if (str_starts_with($name, 'HTTP_')) {

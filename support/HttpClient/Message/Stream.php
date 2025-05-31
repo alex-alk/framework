@@ -12,6 +12,7 @@ class Stream implements StreamInterface
     {
         $this->resource = fopen('php://temp', 'r+');
         if ($content !== '') {
+            $this->ensureResource();
             fwrite($this->resource, $content);
             rewind($this->resource);
         }
@@ -43,8 +44,12 @@ class Stream implements StreamInterface
 
     public function getSize(): ?int
     {
-        $stats = fstat($this->resource);
-        return $stats['size'] ?? null;
+        if ($this->resource === null) {
+            return null;
+        } else {
+            $stats = fstat($this->resource);
+            return $stats['size'] ?? null;
+        }
     }
 
     public function tell(): int
@@ -98,6 +103,8 @@ class Stream implements StreamInterface
 
     public function read($length): string
     {
+        $this->ensureResource();
+
         if (!$this->isReadable()) {
             throw new \RuntimeException('Stream is not readable');
         }
@@ -113,5 +120,17 @@ class Stream implements StreamInterface
     {
         $meta = stream_get_meta_data($this->resource);
         return $key === null ? $meta : ($meta[$key] ?? null);
+    }
+
+    public function __destruct()
+    {
+        $this->close();
+    }
+
+    private function ensureResource()
+    {
+        if (!is_resource($this->resource)) {
+            throw new \RuntimeException('Stream is detached');
+        }
     }
 }

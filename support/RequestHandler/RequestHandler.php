@@ -8,6 +8,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Router\RouteNotFoundException;
 
 class RequestHandler implements RequestHandlerInterface
 {
@@ -82,7 +83,7 @@ class RequestHandler implements RequestHandlerInterface
 
                 // wrong number of parameters
                 if (count($indexNum) !== count($params)) {
-                    RouteNotFound::create();
+                    throw new RouteNotFoundException();
                 }
 
                 //converting array to string
@@ -106,14 +107,15 @@ class RequestHandler implements RequestHandlerInterface
                             $class = $this->container->get($class);
 
                             if (method_exists($class, $method)) {
-                                return call_user_func_array([$class, $method], $params);
+                                $responseStr = call_user_func_array([$class, $method], $params);
+                                return new Response($responseStr, 200, []);
                             }
                         }
                     }
                 }
             }
             // if no route has been found
-            RouteNotFound::create();
+            throw new RouteNotFoundException();
         }
 
 
@@ -133,6 +135,6 @@ class RequestHandler implements RequestHandlerInterface
                 }
             }
         }
-        RouteNotFound::create();
+        throw new RouteNotFoundException();
     }
 }

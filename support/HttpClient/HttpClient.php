@@ -13,8 +13,8 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * How to create parallel requests:
- * $r1 = $factory->createRequest(...);
- * $r2 = $factory->createRequest(...);
+ * $r1 = new Request(...);
+ * $r2 = new Request(...);
  * $responses = $client->sendRequests[$r1, $2];
  * foreach $responses as $response...
  */

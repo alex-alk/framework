@@ -69,8 +69,12 @@ class HttpClientTest extends TestCase
         $client = new HttpClient($curl);
 
         $this->expectException(RequestException::class);
-
-        $client->request('method', 'url');
+        try {
+            $client->request('method', 'url');
+        } catch (RequestException $e) {
+            $e->getRequest();
+            throw $e;
+        }
     }
 
     public function test_sendRequests()

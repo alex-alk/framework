@@ -38,6 +38,7 @@ class ServerRequest implements ServerRequestInterface
         $this->body = $body;
         $this->protocolVersion = $protocolVersion;
         $this->serverParams = $serverParams;
+        $this->parsedBody = json_decode($body, true);
     }
 
     // --- Factory ---
@@ -53,7 +54,6 @@ class ServerRequest implements ServerRequestInterface
         return $request
             ->withCookieParams($_COOKIE)
             ->withQueryParams($_GET)
-            ->withParsedBody($_POST)
             ->withUploadedFiles(self::normalizeUploadedFiles($_FILES));
     }
 

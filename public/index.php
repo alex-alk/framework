@@ -6,10 +6,16 @@ use RequestHandler\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 
 require_once '../autoload.php';
+require_once '../env.php';
+require_once '../support/Utils/functions.php';
 
 // load unit test on dev only
 if (file_exists('../vendor/autoload.php')) {
     require_once '../vendor/autoload.php';
+}
+
+if (!file_exists('../support')) {
+    die('support folder not found. <br>Run: git clone https://github.com/alex-alk/support.git');
 }
 
 $request = ServerRequest::createFromGlobals();

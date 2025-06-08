@@ -10,13 +10,11 @@ require_once '../autoload.php';
 if (!file_exists('../env.php')) {
     die('env.php file not found.<br>Copy env.public.php as env.php');
 }
-
 require_once '../env.php';
 
 if (!file_exists('../support')) {
     die('support folder not found. <br>Run: git clone https://github.com/alex-alk/support.git');
 }
-
 require_once '../support/Utils/functions.php';
 
 // load unit test on dev only

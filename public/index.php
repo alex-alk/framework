@@ -6,6 +6,11 @@ use RequestHandler\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 
 require_once '../autoload.php';
+
+if (!file_exists('../env.php')) {
+    die('env.php file not found.<br>Copy env.public.php as env.php');
+}
+
 require_once '../env.php';
 
 if (!file_exists('../support')) {

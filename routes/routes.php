@@ -1,7 +1,7 @@
 <?php
 
-use Controllers\WebController;
-use Router\Routes;
+use App\Controllers\WebController;
+use Support\Router\Routes;
 
 $routes = new Routes();
 

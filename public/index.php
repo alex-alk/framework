@@ -1,9 +1,9 @@
 <?php
 
-use Container\Container;
-use RequestHandler\RequestHandler;
-use RequestHandler\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
+use Support\Container\Container;
+use Support\RequestHandler\RequestHandler;
+use Support\RequestHandler\ServerRequest;
 
 require_once '../autoload.php';
 
